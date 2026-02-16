@@ -109,14 +109,6 @@ npm run test:e2e      # E2E tests
 - Use issue templates
 - Provide clear reproduction steps
 - Include environment details
-
----
-
-## ❓ Questions?
-
-- GitHub Discussions
-- Email: dev@petad.com
-
 ---
 
 **Happy coding! 🐾**
