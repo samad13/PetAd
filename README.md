@@ -1,21 +1,21 @@
-# PetAd Backend 🐾
+# PetAd Backend — NestJS + Stellar Trust Engine 🐾
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-10+-E0234E.svg)](https://nestjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791.svg)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791.svg)](https://www.postgresql.org/)
 [![Stellar](https://img.shields.io/badge/Stellar-Blockchain-7D00FF.svg)](https://stellar.org/)
 
-A robust, scalable backend API and Stellar blockchain integration layer for the PetAd platform, enabling secure pet adoption and temporary custody management with blockchain-backed trust guarantees.
+A production-grade backend API and blockchain trust layer for **PetAd** — a platform enabling secure pet adoption and temporary custody with verifiable on-chain guarantees powered by Stellar.
 
 ---
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
+- [System Overview](#system-overview)
+- [Core Features](#core-features)
+- [Architecture Principles](#architecture-principles)
 - [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
   - [Installation](#installation)
@@ -24,88 +24,173 @@ A robust, scalable backend API and Stellar blockchain integration layer for the 
   - [Stellar Setup](#stellar-setup)
   - [Running the Server](#running-the-server)
 - [Project Structure](#project-structure)
-- [Core Workflows](#core-workflows)
-  - [Adoption Process](#adoption-process)
-  - [Temporary Custody](#temporary-custody)
-- [API Documentation](#api-documentation)
-- [Security](#security)
-- [Scripts](#scripts)
+- [Core Systems](#core-systems)
+  - [Escrow Engine](#escrow-engine)
+  - [Event Ledger](#event-ledger)
+  - [Trust & Reputation](#trust--reputation)
+- [Stellar Integration](#stellar-integration)
+- [Background Jobs](#background-jobs)
+- [Security Model](#security-model)
+- [Development Workflow](#development-workflow)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [Critical Systems Checklist](#critical-systems-checklist)
+- [Scaling Strategy](#scaling-strategy)
 - [Contributing](#contributing)
 - [License](#license)
 
 ---
 
-## 🌟 Overview
+## 🌟 System Overview
 
-PetAd Backend is the server-side application powering the PetAd platform. It manages all business logic, user authentication, pet data, and orchestrates blockchain escrow operations via the Stellar network. The backend serves as the trusted intermediary between users and the blockchain, ensuring secure, transparent pet adoption and custody transactions.
+PetAd is designed as **trust infrastructure**, not just a CRUD API. The backend serves as a domain-driven trust engine that orchestrates complex custody workflows with blockchain-backed guarantees.
+
+### The Backend Acts As:
+
+- 🏛️ **Domain Engine** for pet custody logic
+- 💰 **Escrow Orchestrator** managing Stellar multisig accounts
+- 📜 **Event Ledger** maintaining immutable custody history
+- 🔗 **Blockchain Gateway** abstracting Stellar complexity
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend (React)                         │
+│            User Interface & Experience Layer                │
+└───────────────────────┬─────────────────────────────────────┘
+                        │ REST API
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│              NestJS Backend (Trust Engine)                  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Domain Layer (Adoption + Custody Workflows)         │  │
+│  └──────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Escrow Engine (Multisig Orchestration)              │  │
+│  └──────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Event Sourcing (Immutable Custody Timeline)         │  │
+│  └──────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Stellar Integration (Blockchain Trust Layer)        │  │
+│  └──────────────────────────────────────────────────────┘  │
+└────┬──────────────────────┬──────────────────┬─────────────┘
+     │                      │                  │
+     ▼                      ▼                  ▼
+┌──────────────┐    ┌──────────────┐   ┌─────────────────┐
+│  PostgreSQL  │    │    Redis     │   │  Stellar        │
+│  (Events +   │    │  (Queues +   │   │  Blockchain     │
+│   State)     │    │   Cache)     │   │  (Trust Layer)  │
+└──────────────┘    └──────────────┘   └─────────────────┘
+```
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-- **🔐 Authentication & Authorization** - JWT-based auth with role-based access control (RBAC)
-- **🐕 Pet Management** - CRUD operations for pet listings with advanced search
-- **❤️ Adoption Workflows** - End-to-end adoption process management
-- **⏰ Temporary Custody Lifecycle** - Time-bound pet custody agreements
-- **💰 Escrow & Payments** - Stellar blockchain-backed payment processing
-- **📄 Document Management** - Secure upload, storage, and verification
-- **🔔 Background Jobs** - Scheduled tasks and event-driven notifications
-- **📊 Audit Logging** - Comprehensive activity tracking for compliance
-- **🔗 Blockchain Integration** - Stellar SDK for on-chain trust layer
+### 🐕 Adoption System
+
+- ✅ Legally-binding adoption agreements
+- 💰 Escrow deposit management
+- 📊 Ownership transfer tracking
+- 🔒 Immutable adoption history on-chain
+
+### ⏰ Temporary Custody System
+
+- ⏱️ Time-bound pet custody agreements
+- 🛡️ Escrow-backed guarantees
+- 🤖 Automatic settlement at term end
+- ⚖️ Built-in dispute resolution
+
+### 📜 Event Ledger
+
+- 📝 Append-only custody timeline
+- 🗺️ Complete pet movement tracking
+- 👤 Adopter trust history
+- 🔗 Blockchain hash anchoring for verification
+
+### 🏆 Trust & Reputation
+
+- ✔️ Completed agreements tracking
+- 🚨 Dispute records and resolution history
+- 🎖️ Verifiable trust profiles for all participants
+- 📈 Reputation scoring algorithm
+
+---
+
+## 🏗️ Architecture Principles
+
+### 1. Event Sourcing
+
+All custody and adoption actions generate **immutable events** that serve as the source of truth.
+
+**Events are:**
+- ✅ Stored in PostgreSQL
+- 🔐 Cryptographically hashed
+- ⛓️ Anchored on Stellar blockchain
+- 🔄 Used to rebuild complete system state
+
+**Example Event Flow:**
+
+```typescript
+PetRegistered → CustodyRequested → EscrowCreated → 
+CustodyStarted → CustodyCompleted → EscrowReleased
+```
+
+### 2. Escrow Isolation
+
+Escrow logic lives in a **dedicated, audited module** with strict guarantees:
+
+- 🔐 2-of-3 multisig account orchestration
+- ⏰ Time-bound automatic settlements
+- 🛡️ Built-in dispute resolution paths
+- 💯 Idempotent transaction handling
+
+### 3. Privacy by Design
+
+User privacy is paramount:
+
+- 🚫 **Zero** personal data stored on-chain
+- 🔒 User identities hashed in blockchain events
+- 📄 Documents encrypted at rest with AES-256
+- 🎭 Anonymous trust profiles with selective disclosure
+
+### 4. Deterministic Workflows
+
+All state transitions follow **strict finite state machines** with no ambiguity:
+
+```typescript
+AdoptionState = 
+  PENDING → APPROVED → ESCROW_FUNDED → ACTIVE → COMPLETED
+
+CustodyState = 
+  REQUESTED → ESCROW_LOCKED → ACTIVE → ENDED → SETTLED
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
+### Backend Framework
+
 | Technology | Purpose | Version |
 |------------|---------|---------|
 | **NestJS** | Progressive Node.js framework | 10+ |
-| **TypeScript** | Type-safe backend development | 5.0+ |
-| **PostgreSQL** | Primary relational database | 16+ |
+| **TypeScript** | Type-safe development | 5.0+ |
 | **Prisma ORM** | Type-safe database client | Latest |
-| **Redis** | Caching and job queues | 7+ |
-| **Stellar SDK** | Blockchain integration | Latest |
-| **Passport** | Authentication middleware | Latest |
-| **Bull** | Background job processing | Latest |
+| **PostgreSQL** | Event store + application state | 15+ |
+| **Redis** | Job queues + caching layer | 7+ |
+| **BullMQ** | Background job processing | Latest |
 
----
+### Blockchain Layer
 
-## 🏗️ Architecture
-
-```
-┌─────────────────┐
-│   Frontend      │
-│   (React)       │
-└────────┬────────┘
-         │ REST API
-         ▼
-┌─────────────────────────────────────┐
-│         NestJS Backend              │
-│  ┌──────────────────────────────┐  │
-│  │  Controllers & Services      │  │
-│  └──────────────────────────────┘  │
-│  ┌──────────────────────────────┐  │
-│  │  Business Logic Layer        │  │
-│  └──────────────────────────────┘  │
-│  ┌──────────────────────────────┐  │
-│  │  Stellar Integration Layer   │  │
-│  └──────────────────────────────┘  │
-└─────┬───────────────────┬──────────┘
-      │                   │
-      ▼                   ▼
-┌──────────────┐   ┌──────────────┐
-│  PostgreSQL  │   │    Redis     │
-│  (Prisma)    │   │  (Cache/Jobs)│
-└──────────────┘   └──────────────┘
-      │
-      ▼
-┌──────────────────────────────┐
-│   Stellar Blockchain         │
-│   (Testnet/Mainnet)          │
-└──────────────────────────────┘
-```
+| Technology | Purpose |
+|------------|---------|
+| **Stellar SDK** | Blockchain interaction library |
+| **Horizon API** | Stellar network gateway |
+| **Multisig Escrow** | 2-of-3 signature accounts |
+| **Hash Anchoring** | Event verification on-chain |
 
 ---
 
@@ -114,18 +199,18 @@ PetAd Backend is the server-side application powering the PetAd platform. It man
 Ensure you have the following installed:
 
 - **Node.js** `>= 20.0.0`
-- **npm** `>= 10.0.0` or **pnpm** `>= 8.0.0`
-- **PostgreSQL** `>= 16.0`
+- **PostgreSQL** `>= 15.0`
 - **Redis** `>= 7.0`
-- **Docker** (optional, for containerized setup)
+- **Docker** (optional but recommended)
+- **Stellar CLI** (optional, for debugging)
 
-**Check versions:**
+**Verify installations:**
 
 ```bash
 node --version
-npm --version
 psql --version
 redis-server --version
+docker --version
 ```
 
 ---
@@ -137,7 +222,7 @@ redis-server --version
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-org/petad-backend.git
+git clone https://github.com/amina69/PetAd-Backend.git
 cd petad-backend
 ```
 
@@ -160,41 +245,47 @@ pnpm install
 Create a `.env` file in the project root:
 
 ```env
-# Database
+# Database Configuration
 DATABASE_URL=postgresql://user:password@localhost:5432/petad
 
-# Redis
+# Redis Configuration
 REDIS_URL=redis://localhost:6379
 
-# Stellar Configuration
-STELLAR_NETWORK=testnet  # Options: testnet | public
-STELLAR_SECRET_KEY=S...  # Your Stellar secret key
-STELLAR_PUBLIC_KEY=G...  # Your Stellar public key
+# Stellar Blockchain
+STELLAR_NETWORK=testnet                    # Options: testnet | public
+STELLAR_SECRET_KEY=S...                    # Platform escrow signing key
+STELLAR_PUBLIC_KEY=G...                    # Platform public address
 STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
 
 # Authentication
-JWT_SECRET=your-super-secure-jwt-secret-min-32-chars
+JWT_SECRET=your-256-bit-secret-min-32-characters
 JWT_EXPIRATION=7d
+
+# Encryption
+ENCRYPTION_KEY=your-aes-256-encryption-key-32-chars  # For document encryption
 
 # Application
 PORT=3000
 NODE_ENV=development
 
 # File Upload
-MAX_FILE_SIZE=10485760  # 10MB in bytes
+MAX_FILE_SIZE=10485760                     # 10MB
 UPLOAD_DEST=./uploads
 
-# Email (Optional)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
+# Background Jobs
+QUEUE_CONCURRENCY=5
+JOB_ATTEMPTS=3
 
-# Monitoring (Optional)
+# Monitoring (Production)
 SENTRY_DSN=
+LOG_LEVEL=debug                            # debug | info | warn | error
 ```
 
-> **⚠️ CRITICAL:** Never commit `.env` files or secret keys to version control. Add `.env` to `.gitignore`.
+> **⚠️ CRITICAL SECURITY WARNING:**
+> - Never commit `.env` files to version control
+> - Use a secrets manager (AWS Secrets Manager, HashiCorp Vault) in production
+> - Rotate keys regularly
+> - Use different keys for testnet and mainnet
 
 ---
 
@@ -206,7 +297,7 @@ SENTRY_DSN=
 createdb petad
 ```
 
-2. **Run migrations**
+2. **Run Prisma migrations**
 
 ```bash
 npx prisma migrate dev --name init
@@ -218,56 +309,61 @@ npx prisma migrate dev --name init
 npx prisma generate
 ```
 
-4. **Seed database (optional)**
+4. **Seed initial data (optional)**
 
 ```bash
 npm run seed
 ```
 
-**View database in Prisma Studio:**
+**Explore database with Prisma Studio:**
 
 ```bash
 npx prisma studio
+# Opens at http://localhost:5555
 ```
 
 ---
 
 ### Stellar Setup
 
-#### Create a Testnet Wallet
+#### Testnet Configuration
 
-1. **Generate a new keypair** using Stellar Laboratory:
+1. **Generate a keypair** using Stellar Laboratory:
    - Visit: https://laboratory.stellar.org/#account-creator?network=test
 
-2. **Fund your account** using Friendbot:
+2. **Fund your account** with test XLM:
    - Visit: https://friendbot.stellar.org
-   - Enter your public key
+   - Paste your public key (G...)
    - Click "Get test network lumens"
 
-3. **Add keys to `.env`:**
+3. **Verify account** on Stellar Explorer:
+   - Visit: https://stellar.expert/explorer/testnet/account/YOUR_PUBLIC_KEY
+
+4. **Add keys to `.env`:**
 
 ```env
 STELLAR_NETWORK=testnet
-STELLAR_SECRET_KEY=S...  # Keep this secret!
-STELLAR_PUBLIC_KEY=G...  # Your account address
+STELLAR_SECRET_KEY=S...  # Keep this absolutely secret!
+STELLAR_PUBLIC_KEY=G...  # Your platform escrow account
 ```
 
-#### Production Setup (Mainnet)
+#### Production (Mainnet) Setup
 
-For production, use a **hardware wallet** or **secure key management service**:
+> **🔴 PRODUCTION CRITICAL:**
+> For mainnet deployment, use **hardware wallets** or **HSM** (Hardware Security Module)
 
 ```env
 STELLAR_NETWORK=public
 STELLAR_HORIZON_URL=https://horizon.stellar.org
+# DO NOT store mainnet secret keys in .env files
+# Use AWS Secrets Manager, GCP Secret Manager, or HashiCorp Vault
 ```
-
-> **🔒 Security Best Practice:** Never store mainnet secret keys in `.env` files. Use environment variables, secrets managers (AWS Secrets Manager, HashiCorp Vault), or hardware security modules (HSMs).
 
 ---
 
 ### Running the Server
 
-**Development mode** (with hot reload):
+**Development mode** (hot reload enabled):
 
 ```bash
 npm run start:dev
@@ -280,13 +376,13 @@ npm run build
 npm run start:prod
 ```
 
-**Debug mode:**
+**Debug mode** (with inspector):
 
 ```bash
 npm run start:debug
 ```
 
-The API will be available at:
+**API available at:**
 
 ```
 http://localhost:3000
@@ -296,6 +392,7 @@ http://localhost:3000
 
 ```bash
 curl http://localhost:3000/health
+# Expected: {"status":"ok","database":"connected","blockchain":"synced"}
 ```
 
 ---
@@ -304,402 +401,463 @@ curl http://localhost:3000/health
 
 ```
 src/
-├── auth/                 # Authentication & authorization
+├── auth/                     # Authentication & authorization
 │   ├── auth.controller.ts
 │   ├── auth.service.ts
 │   ├── jwt.strategy.ts
 │   └── guards/
-├── users/                # User management
+│       ├── jwt-auth.guard.ts
+│       └── roles.guard.ts
+│
+├── users/                    # User management & profiles
 │   ├── users.controller.ts
 │   ├── users.service.ts
-│   └── dto/
-├── pets/                 # Pet listings and management
+│   └── entities/
+│
+├── pets/                     # Pet domain logic
 │   ├── pets.controller.ts
 │   ├── pets.service.ts
 │   └── entities/
-├── adoption/             # Adoption workflow
+│       └── pet.entity.ts
+│
+├── adoption/                 # Adoption workflows
 │   ├── adoption.controller.ts
 │   ├── adoption.service.ts
+│   ├── adoption.state-machine.ts
 │   └── dto/
-├── custody/              # Temporary custody management
+│
+├── custody/                  # Temporary custody workflows
 │   ├── custody.controller.ts
 │   ├── custody.service.ts
+│   ├── custody.state-machine.ts
 │   └── entities/
-├── payments/             # Payment processing
-│   ├── payments.controller.ts
-│   ├── payments.service.ts
-│   └── dto/
-├── stellar/              # Blockchain integration layer
+│
+├── escrow/                   # 🔥 Escrow engine (CRITICAL)
+│   ├── escrow.service.ts
+│   ├── escrow.repository.ts
+│   ├── multisig.builder.ts
+│   ├── settlement.service.ts
+│   └── dispute.handler.ts
+│
+├── events/                   # 📜 Event sourcing system
+│   ├── events.service.ts
+│   ├── event.repository.ts
+│   ├── event.validator.ts
+│   └── event.types.ts
+│
+├── reputation/               # Trust & reputation scoring
+│   ├── reputation.service.ts
+│   ├── trust-score.calculator.ts
+│   └── reputation.controller.ts
+│
+├── stellar/                  # 🔗 Blockchain integration
 │   ├── stellar.service.ts
 │   ├── stellar.module.ts
-│   ├── escrow.service.ts
+│   ├── transaction.builder.ts
+│   ├── hash-anchor.service.ts
 │   └── utils/
-├── jobs/                 # Background job processing
+│       ├── keypair.manager.ts
+│       └── horizon.client.ts
+│
+├── jobs/                     # Background workers (BullMQ)
 │   ├── jobs.module.ts
-│   └── processors/
-├── notifications/        # Email & push notifications
+│   ├── processors/
+│   │   ├── escrow-settlement.processor.ts
+│   │   ├── blockchain-confirmation.processor.ts
+│   │   └── notification.processor.ts
+│   └── queues/
+│
+├── documents/                # Encrypted document handling
+│   ├── documents.service.ts
+│   ├── encryption.service.ts
+│   └── storage.service.ts
+│
+├── notifications/            # Email & push notifications
 │   ├── notifications.service.ts
 │   └── templates/
-├── common/               # Shared utilities
+│
+├── common/                   # Shared utilities
 │   ├── decorators/
 │   ├── filters/
 │   ├── guards/
 │   ├── interceptors/
-│   └── pipes/
-├── config/               # Configuration management
-│   └── configuration.ts
-├── prisma/               # Database schema and migrations
-│   ├── schema.prisma
-│   ├── migrations/
-│   └── seed.ts
-├── main.ts               # Application entry point
-└── app.module.ts         # Root module
+│   ├── pipes/
+│   └── utils/
+│
+├── config/                   # Configuration management
+│   ├── configuration.ts
+│   └── validation.schema.ts
+│
+├── prisma/                   # Database layer
+│   ├── schema.prisma         # Database schema
+│   ├── migrations/           # Version-controlled migrations
+│   └── seed.ts               # Seed data
+│
+├── main.ts                   # Application entry point
+└── app.module.ts             # Root module
 ```
 
-**Key Directories:**
+### Key Directories Explained
 
-- **`auth/`** - JWT authentication, guards, strategies
-- **`stellar/`** - All blockchain-related code (escrow, transactions)
-- **`jobs/`** - Bull queues for background tasks (custody timers, notifications)
-- **`common/`** - Shared decorators, filters, pipes, guards
-- **`prisma/`** - Database schema, migrations, seed data
+- **`escrow/`** - The heart of the trust system; handles all multisig account operations
+- **`events/`** - Append-only event log; single source of truth for system state
+- **`stellar/`** - Abstraction layer for all blockchain interactions
+- **`jobs/`** - Background workers for async operations (settlements, confirmations)
 
 ---
 
-## 🔄 Core Workflows
+## 🔥 Core Systems
 
-### Adoption Process
+### Escrow Engine
+
+The escrow engine is the **most critical component** of PetAd. It manages Stellar multisig accounts with deterministic state transitions.
+
+#### Escrow Lifecycle
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│               Adoption Workflow                          │
-└──────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                  Escrow State Machine                      │
+└────────────────────────────────────────────────────────────┘
 
-1. User submits adoption request
-   ├─→ POST /adoption/requests
-   └─→ {petId, userId, documents, reason}
-
-2. Backend validates documents
-   ├─→ Document verification service
-   ├─→ Background check (optional)
-   └─→ Status: PENDING_REVIEW
-
-3. Admin approves request
-   ├─→ PATCH /adoption/requests/:id/approve
-   └─→ Status: APPROVED
-
-4. Escrow created on Stellar
-   ├─→ Stellar service creates 2-of-2 multisig escrow
-   ├─→ Adoption fee locked
-   └─→ Transaction hash recorded
-
-5. Adoption finalized
-   ├─→ POST /adoption/complete/:id
-   ├─→ Escrow released to shelter
-   ├─→ On-chain receipt created
-   └─→ Status: COMPLETED
-
-6. Notifications sent
-   ├─→ Email to adopter
-   ├─→ Email to shelter
-   └─→ Push notification
+CREATED
+   │
+   ├─→ Multisig account created (2-of-3: Owner, Caretaker, Platform)
+   │
+   ▼
+FUNDED
+   │
+   ├─→ Deposit received and verified
+   │
+   ▼
+ACTIVE
+   │
+   ├─→ Custody/adoption period begins
+   │   Time-lock fallback transaction scheduled
+   │
+   ▼
+COMPLETED / DISPUTED
+   │
+   ├─→ Normal completion OR dispute raised
+   │
+   ▼
+SETTLED
+   │
+   └─→ Funds released according to outcome
 ```
 
-**Code Example:**
+#### Multisig Account Structure
 
 ```typescript
-// adoption/adoption.service.ts
-async createAdoption(dto: CreateAdoptionDto) {
-  // 1. Validate pet availability
-  const pet = await this.prisma.pet.findUnique({
-    where: { id: dto.petId }
+// escrow/multisig.builder.ts
+interface MultisigEscrow {
+  accountId: string;              // Stellar account address
+  signers: {
+    owner: { publicKey: string; weight: 1 };
+    caretaker: { publicKey: string; weight: 1 };
+    platform: { publicKey: string; weight: 1 };
+  };
+  thresholds: {
+    low: 0;
+    medium: 2;  // 2-of-3 required for transactions
+    high: 2;
+  };
+  timeLock?: {
+    unlockDate: Date;
+    fallbackRecipient: string;
+  };
+}
+```
+
+#### Example: Creating an Escrow
+
+```typescript
+// escrow/escrow.service.ts
+async createEscrow(params: CreateEscrowDto): Promise<Escrow> {
+  // 1. Generate new escrow account
+  const escrowKeypair = this.stellarService.generateKeypair();
+  
+  // 2. Build multisig transaction
+  const multisigTx = await this.multisigBuilder.create({
+    escrowAccount: escrowKeypair.publicKey(),
+    signers: [params.ownerPublicKey, params.caretakerPublicKey, PLATFORM_KEY],
+    amount: params.depositAmount,
+    timeLock: params.duration
   });
   
-  if (!pet || pet.status !== 'AVAILABLE') {
-    throw new BadRequestException('Pet not available');
-  }
-
-  // 2. Create adoption request
-  const adoption = await this.prisma.adoption.create({
-    data: {
-      ...dto,
-      status: 'PENDING_REVIEW'
+  // 3. Submit to Stellar
+  const result = await this.stellarService.submitTransaction(multisigTx);
+  
+  // 4. Emit event
+  await this.eventsService.emit({
+    type: 'ESCROW_CREATED',
+    payload: {
+      escrowId: escrowKeypair.publicKey(),
+      txHash: result.hash,
+      timestamp: new Date()
     }
   });
-
-  // 3. Create Stellar escrow
-  const escrow = await this.stellarService.createEscrow({
-    amount: pet.adoptionFee,
-    adopter: dto.userId,
-    shelter: pet.shelterId
-  });
-
-  // 4. Update with blockchain reference
-  return this.prisma.adoption.update({
-    where: { id: adoption.id },
-    data: { 
-      escrowId: escrow.transactionHash,
-      status: 'ESCROW_CREATED'
-    }
+  
+  // 5. Store in database
+  return this.escrowRepository.create({
+    accountId: escrowKeypair.publicKey(),
+    status: 'CREATED',
+    transactionHash: result.hash
   });
 }
 ```
 
----
-
-### Temporary Custody
-
-```
-┌──────────────────────────────────────────────────────────┐
-│            Temporary Custody Workflow                    │
-└──────────────────────────────────────────────────────────┘
-
-1. Custody agreement created
-   ├─→ POST /custody/create
-   └─→ {petId, duration, deposit}
-
-2. Escrow locked on Stellar
-   ├─→ Time-locked escrow contract
-   ├─→ Deposit held in multisig account
-   └─→ Status: ACTIVE
-
-3. Background timer scheduled
-   ├─→ Bull queue job created
-   ├─→ Cron: Check custody end time
-   └─→ Notifications sent before expiry
-
-4. Custody completion
-   ├─→ Auto-release at end time OR
-   ├─→ Manual early completion
-   └─→ Escrow released based on conditions
-
-5. Settlement
-   ├─→ No violations → Full deposit returned
-   ├─→ Violations → Partial/no refund
-   └─→ Status: COMPLETED
-```
-
-**Code Example:**
+#### Automatic Settlement
 
 ```typescript
-// custody/custody.service.ts
-async createCustody(dto: CreateCustodyDto) {
-  // 1. Create custody agreement
-  const custody = await this.prisma.custody.create({
-    data: {
-      ...dto,
-      startDate: new Date(),
-      endDate: addDays(new Date(), dto.durationDays),
-      status: 'PENDING'
+// jobs/processors/escrow-settlement.processor.ts
+@Processor('escrow-settlement')
+export class EscrowSettlementProcessor {
+  @Process('settle')
+  async handleSettlement(job: Job<{ escrowId: string }>) {
+    const escrow = await this.escrowService.findOne(job.data.escrowId);
+    
+    // Check if custody period ended
+    if (escrow.endDate <= new Date() && escrow.status === 'ACTIVE') {
+      // Build settlement transaction
+      const settlementTx = await this.buildSettlement(escrow);
+      
+      // Submit to blockchain
+      await this.stellarService.submitTransaction(settlementTx);
+      
+      // Update state
+      await this.escrowService.updateStatus(escrow.id, 'SETTLED');
+      
+      // Emit event
+      await this.eventsService.emit({
+        type: 'ESCROW_SETTLED',
+        payload: { escrowId: escrow.id, outcome: 'SUCCESS' }
+      });
     }
-  });
-
-  // 2. Lock escrow
-  const escrow = await this.stellarService.createTimeLockEscrow({
-    amount: dto.deposit,
-    custodian: dto.userId,
-    releaseDate: custody.endDate
-  });
-
-  // 3. Schedule completion job
-  await this.jobsService.scheduleCustodyCompletion({
-    custodyId: custody.id,
-    executeAt: custody.endDate
-  });
-
-  return custody;
+  }
 }
 ```
 
 ---
 
-## 📚 API Documentation
+### Event Ledger
 
-### Base URL
+The event ledger provides an **immutable, append-only log** of all custody operations.
+
+#### Event Structure
+
+```typescript
+// events/event.types.ts
+interface CustodyEvent {
+  id: string;
+  type: EventType;
+  aggregateId: string;      // Pet ID or Adoption ID
+  payload: EventPayload;
+  hash: string;             // SHA-256 hash of event
+  blockchainTxHash?: string; // Stellar transaction hash
+  timestamp: Date;
+  userId: string;
+}
+
+enum EventType {
+  PET_REGISTERED = 'PET_REGISTERED',
+  CUSTODY_REQUESTED = 'CUSTODY_REQUESTED',
+  ESCROW_CREATED = 'ESCROW_CREATED',
+  CUSTODY_STARTED = 'CUSTODY_STARTED',
+  CUSTODY_ENDED = 'CUSTODY_ENDED',
+  ESCROW_SETTLED = 'ESCROW_SETTLED',
+  DISPUTE_OPENED = 'DISPUTE_OPENED',
+  DISPUTE_RESOLVED = 'DISPUTE_RESOLVED',
+}
+```
+
+#### Event Flow
 
 ```
-http://localhost:3000/api/v1
+User Action
+     │
+     ▼
+Domain Service (validate)
+     │
+     ▼
+Event Service (create event)
+     │
+     ├─→ Hash event payload
+     │
+     ├─→ Store in PostgreSQL
+     │
+     └─→ Anchor hash on Stellar (async)
 ```
+---
 
-### Authentication
+### Trust & Reputation
 
-All protected endpoints require a JWT token:
+The reputation system provides **verifiable trust scores** based on completed agreements and dispute history.
 
-```bash
-Authorization: Bearer <your-jwt-token>
-```
+#### Trust Score Calculation
 
-### Key Endpoints
+```typescript
+// reputation/trust-score.calculator.ts
+interface TrustScore {
+  overall: number;          // 0-100
+  completedAgreements: number;
+  disputeRate: number;
+  averageRating: number;
+  blockchainVerified: boolean;
+}
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/auth/register` | Create new user account | ❌ |
-| `POST` | `/auth/login` | Login and receive JWT | ❌ |
-| `GET` | `/pets` | List all available pets | ❌ |
-| `GET` | `/pets/:id` | Get pet details | ❌ |
-| `POST` | `/adoption/requests` | Submit adoption request | ✅ |
-| `PATCH` | `/adoption/:id/approve` | Approve adoption (admin) | ✅ Admin |
-| `POST` | `/custody/create` | Create custody agreement | ✅ |
-| `GET` | `/users/me` | Get current user profile | ✅ |
-
-**Swagger Documentation:**
-
-Access interactive API docs at:
-
-```
-http://localhost:3000/api/docs
+async calculateTrustScore(userId: string): Promise<TrustScore> {
+  const history = await this.getHistory(userId);
+  
+  const score = {
+    overall: 0,
+    completedAgreements: history.completed.length,
+    disputeRate: history.disputes.length / history.total.length,
+    averageRating: this.calculateAverage(history.ratings),
+    blockchainVerified: await this.verifyOnChain(userId)
+  };
+  
+  // Weighted calculation
+  score.overall = (
+    (score.completedAgreements * 0.4) +
+    ((1 - score.disputeRate) * 100 * 0.3) +
+    (score.averageRating * 20 * 0.2) +
+    (score.blockchainVerified ? 10 : 0)
+  );
+  
+  return score;
+}
 ```
 
 ---
 
-## 🔒 Security
+## 🔗 Stellar Integration
 
-### Best Practices Implemented
+All blockchain interactions are abstracted behind service classes for maintainability and testability.
 
-✅ **No Personal Data on Blockchain**
-- Only transaction hashes and escrow IDs stored on-chain
-- PII remains in encrypted PostgreSQL database
+### Key Abstraction Layers
 
-✅ **Encrypted Document Storage**
-- Files encrypted at rest using AES-256
-- Access controlled via signed URLs with expiration
+| Service | Responsibility |
+|---------|----------------|
+| `stellar.service.ts` | High-level blockchain operations |
+| `transaction.builder.ts` | Construct Stellar transactions |
+| `hash-anchor.service.ts` | Event hash anchoring |
+| `horizon.client.ts` | Horizon API wrapper |
+| `keypair.manager.ts` | Secure key storage and retrieval |
 
-✅ **Backend Signs All Blockchain Transactions**
-- Private keys never exposed to frontend
-- All Stellar transactions server-signed
+---
 
-✅ **Role-Based Access Control (RBAC)**
-- `USER`, `ADMIN`, `SHELTER` roles
-- Guards enforce permissions at controller level
+## ⚙️ Background Jobs
 
-✅ **Audit Logging**
-- All sensitive operations logged with timestamps
-- User actions tracked for compliance
+BullMQ handles all async operations with retry logic and failure handling.
 
-✅ **Input Validation**
-- DTOs with `class-validator` decorators
-- SQL injection prevention via Prisma ORM
-- XSS protection through sanitization
+### Job Queues
 
-✅ **Rate Limiting**
-- Prevents brute force attacks
-- Configurable per endpoint
+```typescript
+// jobs/jobs.module.ts
+BullModule.registerQueue(
+  { name: 'escrow-settlement' },
+  { name: 'blockchain-confirmation' },
+  { name: 'notifications' },
+  { name: 'document-processing' }
+)
+```
+
+---
 
 ### Security Headers
 
 ```typescript
 // main.ts
-app.use(helmet());
-app.enableCors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-});
+import helmet from 'helmet';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // Security headers
+  app.use(helmet());
+  
+  // CORS configuration
+  app.enableCors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  });
+  
+  // Rate limiting
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100 // limit each IP to 100 requests per windowMs
+    })
+  );
+  
+  await app.listen(3000);
+}
 ```
 
 ---
 
-## 📜 Scripts
+## 🧪 Development Workflow
+
+### Available Scripts
 
 | Command | Description |
 |---------|-------------|
 | `npm run start` | Start application |
-| `npm run start:dev` | Development mode with hot reload |
-| `npm run start:debug` | Debug mode |
+| `npm run start:dev` | Development with hot reload |
+| `npm run start:debug` | Debug mode with inspector |
 | `npm run start:prod` | Production mode |
 | `npm run build` | Build for production |
 | `npm run test` | Run unit tests |
-| `npm run test:e2e` | Run end-to-end tests |
+| `npm run test:watch` | Watch mode for tests |
 | `npm run test:cov` | Generate coverage report |
-| `npm run lint` | Lint code with ESLint |
-| `npm run format` | Format code with Prettier |
+| `npm run test:e2e` | End-to-end tests |
+| `npm run lint` | Lint with ESLint |
+| `npm run format` | Format with Prettier |
 | `npm run prisma:migrate` | Run database migrations |
 | `npm run prisma:generate` | Generate Prisma Client |
 | `npm run prisma:studio` | Open Prisma Studio |
-| `npm run seed` | Seed database with sample data |
+| `npm run seed` | Seed database |
 
 ---
 
-## 🧪 Testing
-
-### Unit Tests
-
-```bash
-npm run test
-```
-
-### E2E Tests
-
-```bash
-npm run test:e2e
-```
-
-### Coverage Report
-
-```bash
-npm run test:cov
-```
-
-**Example Test:**
-
-```typescript
-// adoption/adoption.service.spec.ts
-describe('AdoptionService', () => {
-  let service: AdoptionService;
-  let prisma: PrismaService;
-
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
-      providers: [AdoptionService, PrismaService, StellarService],
-    }).compile();
-
-    service = module.get<AdoptionService>(AdoptionService);
-    prisma = module.get<PrismaService>(PrismaService);
-  });
-
-  it('should create adoption request', async () => {
-    const dto = { petId: '1', userId: 'user-1', reason: 'Love pets' };
-    const result = await service.createAdoption(dto);
-    
-    expect(result.status).toBe('PENDING_REVIEW');
-    expect(result.petId).toBe('1');
-  });
-});
-```
-
 ---
 
-## 🚀 Deployment
-
-### Recommended Stack
-
-| Component | Service | Notes |
-|-----------|---------|-------|
-| **Backend** | AWS ECS / Google Cloud Run / Railway | Docker container |
-| **Database** | AWS RDS PostgreSQL / Supabase | Managed service |
-| **Redis** | AWS ElastiCache / Upstash | Managed Redis |
-| **Storage** | AWS S3 / Cloudflare R2 | Document uploads |
-| **Monitoring** | Sentry / DataDog | Error tracking |
-
----
-
-### Docker Deployment
+### Docker Configuration
 
 **Dockerfile:**
 
 ```dockerfile
+# Multi-stage build for production
 FROM node:20-alpine AS builder
+
 WORKDIR /app
+
 COPY package*.json ./
+COPY prisma ./prisma/
+
 RUN npm ci
+
 COPY . .
+
+RUN npx prisma generate
 RUN npm run build
 
+# Production image
 FROM node:20-alpine
+
 WORKDIR /app
+
+ENV NODE_ENV=production
+
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
 COPY package*.json ./
+
 EXPOSE 3000
+
 CMD ["node", "dist/main"]
 ```
 
@@ -707,12 +865,10 @@ CMD ["node", "dist/main"]
 
 ```bash
 docker build -t petad-backend .
-docker run -p 3000:3000 --env-file .env petad-backend
+docker run -p 3000:3000 --env-file .env.production petad-backend
 ```
 
----
-
-### Docker Compose (Local Development)
+### Docker Compose (Development)
 
 ```yaml
 version: '3.8'
@@ -726,9 +882,12 @@ services:
     depends_on:
       - postgres
       - redis
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     environment:
       POSTGRES_DB: petad
       POSTGRES_USER: user
@@ -742,12 +901,24 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  prisma-studio:
+    image: timothyjmiller/prisma-studio:latest
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/petad
+    ports:
+      - "5555:5555"
+    depends_on:
+      - postgres
 
 volumes:
   pgdata:
+  redisdata:
 ```
 
-**Start services:**
+**Start full stack:**
 
 ```bash
 docker-compose up -d
@@ -755,40 +926,121 @@ docker-compose up -d
 
 ---
 
-### Environment Variables (Production)
+## ✅ Critical Systems Checklist
 
-Ensure these are set in your deployment platform:
+### Must Build Carefully
 
-```bash
-DATABASE_URL=postgresql://...
-REDIS_URL=redis://...
-STELLAR_NETWORK=public
-STELLAR_SECRET_KEY=<use-secrets-manager>
-JWT_SECRET=<use-secrets-manager>
-NODE_ENV=production
+These systems require extra scrutiny:
+
+- [ ] **Escrow State Machine** - No ambiguous transitions, all paths tested
+- [ ] **Event Validation Engine** - Strict schema validation, no invalid events
+- [ ] **Stellar Transaction Signer** - Secure key management, idempotent signing
+- [ ] **Key Management Service** - Encrypted storage, rotation policies
+- [ ] **Dispute Workflow Logic** - Fair resolution, auditable decisions
+
+### Important Infrastructure
+
+- [ ] **Backup Strategy** - Automated daily backups, tested restore procedures
+- [ ] **Monitoring & Alerts** - Error tracking, performance metrics, uptime alerts
+- [ ] **Rate Limiting** - Per-user and per-IP limits, DDoS protection
+- [ ] **Error Tracking** - Sentry integration, error aggregation
+- [ ] **Audit Logs** - Immutable logs, compliance-ready, searchable
+
+### Recommended Monitoring Tools
+
+| Tool | Purpose |
+|------|---------|
+| **Sentry** | Error monitoring and crash reporting |
+| **OpenTelemetry** | Distributed tracing across services |
+| **Prometheus + Grafana** | Metrics collection and visualization |
+| **PagerDuty / Opsgenie** | On-call alerts and incident management |
+
+---
+
+## 📈 Scaling Strategy
+
+### Phase 1: Modular Monolith
+
+**Current architecture** (suitable for 0-10K users):
+
+- Single NestJS application
+- Redis for job queues
+- PostgreSQL with read replicas
+- Horizontal scaling via load balancer
+
+### Phase 2: Service Extraction
+
+**When to scale** (10K-100K users):
+
+- Extract escrow engine to dedicated service
+- Separate worker service for background jobs
+- Event streaming with Kafka/RabbitMQ
+- Horizontal scaling per service
+
+**Architecture:**
+
 ```
+Load Balancer
+     │
+     ├─→ API Service (multiple instances)
+     ├─→ Worker Service (job processing)
+     └─→ Escrow Service (critical path isolation)
+     
+Kafka Event Bus
+     │
+     ├─→ Event Store
+     └─→ Analytics Pipeline
+```
+
+### Phase 3: Microservices (Optional)
+
+**When to scale** (100K+ users):
+
+- Adoption service
+- Custody service
+- Escrow service
+- Event sourcing service
+- Notification service
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
+We welcome contributions! Please follow these guidelines:
+
+### Workflow
 
 1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+2. **Create a feature branch** (`git checkout -b feature/escrow-improvements`)
 3. **Write tests** for new functionality
-4. **Ensure all tests pass** (`npm run test`)
+4. **Ensure all tests pass** (`npm run test && npm run test:e2e`)
 5. **Lint your code** (`npm run lint`)
-6. **Commit with conventional commits** (`feat:`, `fix:`, `docs:`, etc.)
-7. **Push to your fork** (`git push origin feature/amazing-feature`)
+6. **Commit with conventional commits:**
+   - `feat:` new feature
+   - `fix:` bug fix
+   - `docs:` documentation changes
+   - `refactor:` code refactoring
+   - `test:` test additions/changes
+7. **Push to your fork** (`git push origin feature/escrow-improvements`)
 8. **Open a Pull Request**
 
-**Code Review Checklist:**
+### Critical Module Review
+
+Pull requests affecting these modules require **mandatory review** by 2+ maintainers:
+
+- `escrow/`
+- `stellar/`
+- `events/`
+- `auth/`
+
+### Code Review Checklist
+
 - [ ] Tests added/updated
 - [ ] Documentation updated
 - [ ] No security vulnerabilities introduced
 - [ ] Environment variables documented
-- [ ] Breaking changes clearly noted
+- [ ] Breaking changes clearly noted in PR description
+- [ ] Escrow state machine integrity maintained
 
 ---
 
@@ -800,29 +1052,18 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🙏 Acknowledgments
 
-- Built with ❤️ for transparent, trustworthy pet adoption
-- Powered by [Stellar](https://stellar.org) blockchain technology
-- Inspired by the mission to connect pets with loving homes
-
----
-
-## 📞 Support
-
-For questions, issues, or feature requests:
-
-- **GitHub Issues:** [github.com/your-org/petad-backend/issues](https://github.com/your-org/petad-backend/issues)
-- **Email:** dev@petad.com
-- **Discord:** [Join our developer community](https://discord.gg/petad)
-- **Documentation:** [docs.petad.com](https://docs.petad.com)
+- Built with ❤️ to enable transparent, trustworthy pet adoption
+- Powered by [Stellar](https://stellar.org) blockchain for verifiable trust
+- Inspired by the mission to connect pets with loving homes through technology
 
 ---
 
 ## 🔗 Related Projects
 
-- **Frontend:** [petad-frontend](https://github.com/your-org/petad-frontend)
-- **Mobile App:** [petad-mobile](https://github.com/your-org/petad-mobile)
-- **Smart Contracts:** [petad-contracts](https://github.com/your-org/petad-contracts)
+- **Frontend:** [petad-frontend](https://github.com/amina69/PetAd-Frontend) - React web application
 
 ---
 
 **Made with 🐾 by the PetAd Team**
+
+*Building trust infrastructure for pet adoption, one escrow at a time.*
